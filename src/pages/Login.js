@@ -43,6 +43,28 @@ const Login = () => {
       .required('Password is required')
   });
   
+  // Debug function to help diagnose login issues
+  const debugLoginIssue = (error) => {
+    console.log('Login Error Details:', {
+      errorObject: error,
+      errorResponse: error.response,
+      errorData: error.response?.data,
+      errorMessage: error.message
+    });
+    
+    if (error.response?.status === 401) {
+      return 'Invalid username or password. Please try again.';
+    } else if (error.response?.status === 403) {
+      return 'Your account is suspended or pending activation.';
+    } else if (error.response?.status >= 500) {
+      return 'Server error. Please try again later.';
+    } else if (error.message.includes('Network Error')) {
+      return 'Network error. Please check your internet connection.';
+    }
+    
+    return error.response?.data?.message || 'Failed to login. Please check your credentials.';
+  };
+  
   // Formik hook for form handling
   const formik = useFormik({
     initialValues: {
@@ -55,11 +77,19 @@ const Login = () => {
       setError(null);
       
       try {
-        await login(values);
+        const result = await login(values);
+        console.log('Login successful:', result);
+        
+        // Verify authentication state before redirecting
+        if (!localStorage.getItem('token') || !localStorage.getItem('user')) {
+          throw new Error('Authentication failed: Missing credentials in storage');
+        }
+        
         // Redirect to the page the user tried to access before
         navigate(from, { replace: true });
       } catch (err) {
-        setError(err.response?.data?.message || 'Failed to login. Please check your credentials.');
+        console.error('Login submission error:', err);
+        setError(debugLoginIssue(err));
       } finally {
         setLoading(false);
       }
@@ -121,6 +151,12 @@ const Login = () => {
               {location.state.message}
             </Alert>
           )}
+          
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" align="center">
+              Test account: testuser / Password123
+            </Typography>
+          </Box>
           
           <form onSubmit={formik.handleSubmit}>
             <TextField

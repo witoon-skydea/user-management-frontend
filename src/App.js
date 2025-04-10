@@ -20,6 +20,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import UserHome from './pages/UserHome';
 import UserProfile from './pages/UserProfile';
 import ForgotPassword from './pages/ForgotPassword';
 import NotFound from './pages/NotFound';
@@ -43,10 +44,16 @@ function App() {
               <Route path="forgot-password" element={<ForgotPassword />} />
               <Route path="forbidden" element={<Forbidden />} />
               
-              {/* Protected Routes */}
+              {/* Admin Routes - Dashboard is now admin-only */}
               <Route path="dashboard" element={
-                <PrivateRoute>
+                <PrivateRoute requiredRoles={['admin']}>
                   <Dashboard />
+                </PrivateRoute>
+              } />
+              
+              <Route path="user-home" element={
+                <PrivateRoute>
+                  <UserHome />
                 </PrivateRoute>
               } />
               

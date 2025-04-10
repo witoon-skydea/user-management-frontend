@@ -46,11 +46,11 @@ const Forbidden = () => {
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button 
             component={Link} 
-            to="/dashboard" 
+            to="/profile" 
             variant="contained" 
             color="primary"
           >
-            Back to Dashboard
+            My Profile
           </Button>
           
           <Button 

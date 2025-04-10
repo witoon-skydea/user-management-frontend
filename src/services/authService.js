@@ -23,14 +23,22 @@ const login = async (credentials) => {
     const response = await api.post('/users/login', credentials);
     console.log('Login response:', response);
     
-    const { token, refreshToken, user } = response.data;
+    if (!response || !response.data || !response.data.data) {
+      throw new Error('Invalid response format from server');
+    }
+    
+    const { token, refreshToken, user } = response.data.data;
+    
+    if (!token || !refreshToken || !user) {
+      throw new Error('Missing authentication data in response');
+    }
     
     // Save auth data to local storage
     localStorage.setItem('token', token);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('user', JSON.stringify(user));
     
-    return response.data;
+    return response.data.data;
   } catch (error) {
     console.error('Login error:', error.response?.data || error);
     throw error;
@@ -83,6 +91,22 @@ const isAuthenticated = () => {
   return localStorage.getItem('token') !== null;
 };
 
+const hasRole = (role) => {
+  const user = getCurrentUser();
+  if (!user || !user.roles) return false;
+  
+  return user.roles.includes(role);
+};
+
+const hasAnyRole = (requiredRoles = []) => {
+  if (requiredRoles.length === 0) return true;
+  
+  const user = getCurrentUser();
+  if (!user || !user.roles || !Array.isArray(user.roles)) return false;
+  
+  return requiredRoles.some(role => user.roles.includes(role));
+};
+
 const changePassword = async (passwordData) => {
   const response = await api.post('/users/change-password', passwordData);
   return response.data;
@@ -111,6 +135,8 @@ const authService = {
   verifyEmail,
   getCurrentUser,
   isAuthenticated,
+  hasRole,
+  hasAnyRole,
   changePassword,
   updateProfile,
   getProfile

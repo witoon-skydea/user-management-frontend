@@ -67,7 +67,7 @@ const Header = () => {
   
   // Navigation items
   const navigationItems = [
-    { name: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', showWhen: 'authenticated' },
+    { name: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard', showWhen: 'admin' },
     { name: 'Users', icon: <PeopleIcon />, path: '/users', showWhen: 'admin' },
     { name: 'Services', icon: <BusinessCenterIcon />, path: '/services', showWhen: 'admin' },
     { name: 'Roles', icon: <BadgeIcon />, path: '/roles', showWhen: 'admin' },
