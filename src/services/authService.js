@@ -4,29 +4,11 @@ const register = async (userData) => {
   try {
     console.log('Attempting to register user with data:', userData);
     
-    // For testing only - simulate successful registration
-    // Replace this with actual API call when backend is ready
-    // Uncomment below when API is working
-    // const response = await api.post('/users/register', userData);
+    // Use actual API
+    const response = await api.post('/users/register', userData);
+    console.log('Registration response:', response);
     
-    // Mock successful response for testing
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Registration successful (mock)');
-    
-    const mockResponse = {
-      success: true,
-      message: 'User registered successfully',
-      user: {
-        id: Date.now().toString(),
-        username: userData.username,
-        email: userData.email,
-        displayName: userData.displayName,
-        isEmailVerified: false,
-        status: 'pending'
-      }
-    };
-    
-    return mockResponse;
+    return response.data;
   } catch (error) {
     console.error('Registration error:', error.response?.data || error);
     throw error;
@@ -37,40 +19,18 @@ const login = async (credentials) => {
   try {
     console.log('Attempting to login with credentials:', credentials);
     
-    // For testing only - simulate successful login
-    // Replace this with actual API call when backend is ready
-    // Uncomment below when API is working
-    // const response = await api.post('/users/login', credentials);
+    // Use actual API
+    const response = await api.post('/users/login', credentials);
+    console.log('Login response:', response);
     
-    // Mock successful response for testing
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Login successful (mock)');
+    const { token, refreshToken, user } = response.data;
     
-    // Check if credentials match test user
-    if (credentials.username === 'mm11' && credentials.password === 'mm11mm11') {
-      const mockResponse = {
-        token: 'mock-jwt-token-' + Date.now(),
-        refreshToken: 'mock-refresh-token-' + Date.now(),
-        user: {
-          id: Date.now().toString(),
-          username: credentials.username,
-          email: 'mm11@example.com',
-          displayName: 'MM User',
-          isEmailVerified: true,
-          status: 'active',
-          roles: ['admin']
-        }
-      };
-      
-      // Save auth data to local storage
-      localStorage.setItem('token', mockResponse.token);
-      localStorage.setItem('refreshToken', mockResponse.refreshToken);
-      localStorage.setItem('user', JSON.stringify(mockResponse.user));
-      
-      return mockResponse;
-    } else {
-      throw new Error('Invalid credentials');
-    }
+    // Save auth data to local storage
+    localStorage.setItem('token', token);
+    localStorage.setItem('refreshToken', refreshToken);
+    localStorage.setItem('user', JSON.stringify(user));
+    
+    return response.data;
   } catch (error) {
     console.error('Login error:', error.response?.data || error);
     throw error;

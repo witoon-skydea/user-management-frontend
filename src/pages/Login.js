@@ -46,8 +46,8 @@ const Login = () => {
   // Formik hook for form handling
   const formik = useFormik({
     initialValues: {
-      username: 'mm11', // Pre-filled for testing
-      password: 'mm11mm11', // Pre-filled for testing
+      username: '',
+      password: '',
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
