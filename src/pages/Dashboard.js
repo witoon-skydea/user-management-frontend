@@ -4,7 +4,7 @@ import DashboardStats from '../components/dashboard/DashboardStats';
 import ActivityChart from '../components/dashboard/ActivityChart';
 import RecentActivitiesTable from '../components/dashboard/RecentActivitiesTable';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../services/api';
+import dashboardService from '../services/dashboardService';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -19,97 +19,28 @@ const Dashboard = () => {
     const fetchDashboardData = async () => {
       setLoading(true);
       try {
-        // In a real application, you would fetch this data from your API
-        // For now, we'll simulate an API call with a timeout
+        // Fetch actual data from API
+        const [statsData, activityData, recentActivities] = await Promise.all([
+          dashboardService.getStats(),
+          dashboardService.getActivityData(),
+          dashboardService.getRecentActivities(5)
+        ]);
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock data for demonstration
-        const mockStats = {
-          totalUsers: 256,
-          activeServices: 18,
-          totalRoles: 24,
-          recentActivities: 143
-        };
-        
-        const mockActivityData = {
-          labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-          datasets: [
-            {
-              label: 'User Logins',
-              data: [65, 59, 80, 81, 56, 55, 40],
-              fill: false,
-              borderColor: 'rgb(13, 71, 161)',
-              backgroundColor: 'rgba(13, 71, 161, 0.5)',
-            },
-            {
-              label: 'New Registrations',
-              data: [28, 48, 40, 19, 86, 27, 90],
-              fill: false,
-              borderColor: 'rgb(46, 125, 50)',
-              backgroundColor: 'rgba(46, 125, 50, 0.5)',
-            },
-            {
-              label: 'Service Access',
-              data: [33, 25, 35, 51, 54, 76, 80],
-              fill: false,
-              borderColor: 'rgb(198, 40, 40)',
-              backgroundColor: 'rgba(198, 40, 40, 0.5)',
-            },
-          ],
-        };
-        
-        const mockRecentActivities = [
-          {
-            id: '1',
-            user: 'John Doe',
-            action: 'User Login',
-            details: 'Successful login from IP 192.168.1.1',
-            timestamp: new Date().toISOString(),
-            status: 'success'
-          },
-          {
-            id: '2',
-            user: 'Jane Smith',
-            action: 'Password Change',
-            details: 'Password changed successfully',
-            timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-            status: 'success'
-          },
-          {
-            id: '3',
-            user: 'Alice Johnson',
-            action: 'Access Service',
-            details: 'Failed to access TOC_workshop service',
-            timestamp: new Date(Date.now() - 7200000).toISOString(), // 2 hours ago
-            status: 'failed'
-          },
-          {
-            id: '4',
-            user: 'Bob Brown',
-            action: 'User Registration',
-            details: 'New user registration',
-            timestamp: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-            status: 'success'
-          },
-          {
-            id: '5',
-            user: 'Charlie Davis',
-            action: 'Role Assignment',
-            details: 'Assigned role: workshop_manager',
-            timestamp: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-            status: 'warning'
-          },
-        ];
-        
-        setStats(mockStats);
-        setActivityData(mockActivityData);
-        setRecentActivities(mockRecentActivities);
+        setStats(statsData);
+        setActivityData(activityData);
+        setRecentActivities(recentActivities);
         setError(null);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
         setError('Failed to load dashboard data. Please try again later.');
+        
+        // Set fallback data if API fails
+        setStats({
+          totalUsers: 0,
+          activeServices: 0,
+          totalRoles: 0,
+          recentActivities: 0
+        });
       } finally {
         setLoading(false);
       }
